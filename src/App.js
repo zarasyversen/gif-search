@@ -3,35 +3,38 @@ import './App.css';
 
 
 function Search() {
-  const [gif, setGif] = useState('');
-  const [gifResult, setGifResult] = useState(null);
+  const [query, setQuery] = useState('');
+  const [gifImage, setGifImage] = useState('');
+  const [gifTitle, setGifTitle] = useState('');
 
 
   useEffect(() => {
-    fetch(`https://api.giphy.com/v1/gifs/search?q=${gif}&api_key=zZnqZOboTbEjlNiNQya72nriefU8Qc9v`)
+    let isCurrent = true;
+    fetch(`https://api.giphy.com/v1/gifs/search?q=${query}&api_key=zZnqZOboTbEjlNiNQya72nriefU8Qc9v`)
     .then((res) => res.json())
     .then((res) => {
-      if (res.data[0]) {
-        setGifResult(res.data[0].images.original.url)
+      if (isCurrent && res.data[0]) {
+        setGifImage(res.data[0].images.original.url)
+        setGifTitle(res.data[0].title)
       }
-
     })
-   
-  }, [gif])
-
-
+    return () => {
+      // Clean up function like componentWillUnmount
+      isCurrent = false;
+    }
+  }, [query])
 
   return (
     <div>
       <input
         type="text"
-        value={gif}
+        value={query}
         onChange={(event) => {
-        setGif(event.target.value)
+        setQuery(event.target.value)
         }} 
       />
-      {gifResult && 
-        <img src={gifResult} />
+      {gifImage && 
+        <img src={gifImage} alt={gifTitle} />
       }
     </div>
   )
